@@ -21,8 +21,11 @@ def loading_map():
     points = []
     object_names = []
     for object in map_objects:
-        points.append(object["coordinates"])
         object_names.append(object["name"])
+        if len(object["coordinates"]) > 2:
+            points.append(object["coordinates"])
+
+
 
 
     return points
