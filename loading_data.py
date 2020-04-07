@@ -10,8 +10,6 @@ def loading_map():
         data = json.load(map_data_0)
 
     #print(data)
-
-
     map_name = data["map_name"]
     map_units = data["units"]
     #map_coordinates = data["object"][0]["coordinates"]
