@@ -1,13 +1,13 @@
 import json
+import config
 
-
-def loading_map():
+def loading_map(map):
     """
     Tato funkce načte mapu
     :return: výstupem funkce bude seznam souřadnic
     """
-    with open('map_data_0.json') as map_data_0:
-        data = json.load(map_data_0)
+    with open(map["PATH"]) as map["NAME"]:
+        data = json.load(map["NAME"])
 
     #print(data)
 
@@ -25,19 +25,16 @@ def loading_map():
         if len(object["coordinates"]) > 2:
             points.append(object["coordinates"])
 
-
-
-
     return points
 
 
-def load_start_and_end():
+def load_start_and_end(test_path):
     """
     Tato funkce načte startovní a cílovou pozici
     :return: Výstupem této funkce bude startovní a cílová poizce
     """
-    with open('test_path.json') as test_path:
-        data = json.load(test_path)
+    with open(test_path["PATH"]) as test_path["NAME"]:
+        data = json.load(test_path["NAME"])
 
     #print(data)
 
@@ -53,10 +50,14 @@ def load_start_and_end():
 
 
 def main():
-    points = loading_map()
+    map0 = config.MAPS["map_0"]
+    map1 = config.MAPS["map_1"]
+    points = loading_map(map0)
     print("points:", points)
-    starts, ends = load_start_and_end()
-    print("starts", starts, "ends", ends)
+
+    test_path = config.TEST_PATH["test_path"]
+    starts, ends = load_start_and_end(test_path)
+    print("starts:", starts, ",", "ends:", ends)
 
 
 if __name__ == "__main__":
