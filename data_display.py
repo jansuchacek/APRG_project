@@ -10,7 +10,7 @@ def draw_points(points):
     :return: graf bodů
     """
     xs = []
-    xy = []
+    ys = []
     for set_of_points in points:
         x,y = zip(*set_of_points)
         print(x,y)
@@ -20,9 +20,9 @@ def draw_points(points):
         for index in range(len(x)):
             xs.append(x[index])
         for index in range(len(y)):
-            xy.append(y[index])
+            ys.append(y[index])
 
-    plt.scatter(xs, xy)
+    plt.scatter(xs, ys)
     return plt.show()       #vykreslí body všech překážek najednou do jednoho grafu
 
 
