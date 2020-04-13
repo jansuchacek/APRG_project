@@ -84,11 +84,10 @@ def graham_scan(points, show_progress=False):
 def main():
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
-    points = loading_data.loading_map(map1)
+    points = loading_data.loading_map(map0)
     for sets in points:
         graham_scan(sets, False)
         display_points(sets, graham_scan(sets, False))
-
 
 
 if __name__ == "__main__":
