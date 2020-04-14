@@ -117,7 +117,6 @@ def graham_scan(points, show_progress=False):
             del hull[-1]
             #if len(hull)<2: break
         hull.append(s)
-        if show_progress:
         if show_progress != False:
             zobrazeni_bodu(points, hull)
     return hull
