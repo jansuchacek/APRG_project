@@ -6,9 +6,8 @@ import loading_data
 
 
 def display_points(points, convex_hull=None):
-    for set_of_points in points:
-        xs, ys = zip(*set_of_points)
-        plt.scatter(xs, ys)
+    xs, ys = zip(*points)
+    plt.scatter(xs, ys)
 
     if convex_hull != None:
         for i in range(1, len(convex_hull)+1):
@@ -63,32 +62,33 @@ def graham_scan(points, show_progress=False):
     global anchor
 
     min_idx = None
-    for sets in points:
-        for i, (x, y) in enumerate(sets):
-            if (min_idx == None) or (y < sets[min_idx][1]):
-                min_idx = i
-            if (y == sets[min_idx][1]) and (x < sets[min_idx][0]):
-                min_idx = i
-        anchor = sets[min_idx]
-        sorted_points = angle_sort(sets)
-        del sorted_points[sorted_points.index(anchor)]
-        hull = [anchor, sorted_points[0]]
-        for s in sorted_points[1:]:
-            while determinant(hull[-2], hull[-1], s) <= 0:
-                del hull[-1]
-                #if len(hull)<2: break
-            hull.append(s)
-            if show_progress:
-                display_points(sets, hull)
-        return hull
+    for i, (x, y) in enumerate(points):
+        if (min_idx == None) or (y < points[min_idx][1]):
+            min_idx = i
+        if (y == points[min_idx][1]) and (x < points[min_idx][0]):
+            min_idx = i
+    anchor = points[min_idx]
+    sorted_points = angle_sort(points)
+    del sorted_points[sorted_points.index(anchor)]
+    hull = [anchor, sorted_points[0]]
+    for s in sorted_points[1:]:
+        while determinant(hull[-2], hull[-1], s) <= 0:
+            del hull[-1]
+            #if len(hull)<2: break
+        hull.append(s)
+        if show_progress:
+            display_points(points, hull)
+    return hull
 
 
 def main():
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
     points = loading_data.loading_map(map1)
-    graham_scan(points, True)
-    display_points(points, graham_scan(points, True))
+    for sets in points:
+        graham_scan(sets, False)
+        display_points(sets, graham_scan(sets, False))
+
 
 
 if __name__ == "__main__":
