@@ -78,7 +78,9 @@ def razeni_podle_uhlu(points):
     """
     if len(points) <= 1:
         return points
-    smaller, equal, bigger = [], [], []
+    smaller = []
+    equal = []
+    bigger = []
     rand_ang = polarni_uhel(points[randint(0, len(points) - 1)])
     for pt in points:
         pt_ang = polarni_uhel(pt)
@@ -126,12 +128,8 @@ def main():
     """Hlavná funkcia"""
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
-    points = loading_data.loading_map(map1)
-    for sets in points:
-        graham_scan(sets, False)
-        zobrazeni_bodu(sets, graham_scan(sets, False))
 
-    points = loading_data.loading_map(map0)
+    points = loading_data.loading_map(map1)
 
     for sets in points:
         print("Súradnice polygonu: ", sets)
