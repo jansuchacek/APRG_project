@@ -6,7 +6,6 @@ import loading_data
 
 
 def zobrazeni_bodu(points, convex_hull=None):
-
     """
     Funkcia zobrazí načítané dáta z mapy.
     :param points: jednotlivé polygony v mape
@@ -14,8 +13,8 @@ def zobrazeni_bodu(points, convex_hull=None):
     :return: zobrazí výsledok
     """
 
-    xs, ys = zip(*points)
-    plt.scatter(xs, ys)
+    x, y = zip(*points)
+    plt.scatter(x, y)
 
     if convex_hull != None:
         for i in range(1, len(convex_hull)+1):
@@ -56,7 +55,7 @@ def vzdalenost_bodu(p0, p1=None):
     return y_line**2 + x_line**2
 
 
-def determinant(p1,p2,p3):
+def determinant(p1, p2, p3):
     """
     Vráti determinant matice 3x3 troch po sebe nasledujúcich bodov polygonu:
         [p1(x) p1(y) 1]
@@ -78,7 +77,9 @@ def razeni_podle_uhlu(points):
     """
     if len(points) <= 1:
         return points
-    smaller, equal, bigger = [], [], []
+    smaller = []
+    equal = []
+    bigger = []
     rand_ang = polarni_uhel(points[randint(0, len(points) - 1)])
     for pt in points:
         pt_ang = polarni_uhel(pt)
@@ -129,7 +130,7 @@ def main():
     points = loading_data.loading_map(map0)
 
     for sets in points:
-        print("Súradnice polygonu: ", sets)
+        print(sets)
         graham_scan(sets, False)
         zobrazeni_bodu(sets, graham_scan(sets, False))
 
