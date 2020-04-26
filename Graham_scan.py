@@ -23,7 +23,6 @@ def zobrazeni_bodu(points, convex_hull=None):
             h0 = convex_hull[i-1]
             h1 = convex_hull[i]
             plt.plot((h0[0], h1[0]), (h0[1], h1[1]), "r")
-    plt.show()
 
 
 def polarni_uhel(p0, p1=None):
@@ -94,11 +93,10 @@ def razeni_podle_uhlu(points):
            + razeni_podle_uhlu(bigger)
 
 
-def graham_scan(points, show_progress=False):
+def graham_scan(points):
     """
     Funkcia vytvorí konvexný obal ku každému polygonu mapy.
     :param points: body daného polygonu
-    :param show_progress: možnosť zobraziť priebeh zobrazovania konvexného obalu
     :return: vráti konvexnú obálku
     """
     global anchor   # premenná "anchor" nastavená ako globálna - najnižší bod
@@ -116,10 +114,7 @@ def graham_scan(points, show_progress=False):
     for s in sorted_points[1:]:
         while determinant(hull[-2], hull[-1], s) <= 0:
             del hull[-1]
-            #if len(hull)<2: break
         hull.append(s)
-        if show_progress != False:
-            zobrazeni_bodu(points, hull)
     return hull
 
 
@@ -127,12 +122,13 @@ def main():
     """Hlavná funkcia"""
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
-    points = loading_data.loading_map(map0)
+    points = loading_data.loading_map(map1)
+
 
     for sets in points:
         print(sets)
-        graham_scan(sets, False)
-        zobrazeni_bodu(sets, graham_scan(sets, False))
+        zobrazeni_bodu(sets, graham_scan(sets))
+    plt.show()
 
 
 if __name__ == "__main__":
