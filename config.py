@@ -15,5 +15,9 @@ TEST_PATH = {
     "test_path": {
         "NAME": "test_path",
         "PATH": "test_path.json"
+    },
+    "onepath": {
+        "NAME": "onepath",
+        "PATH": "onepath.json"
     }
 }
