@@ -5,6 +5,7 @@ import config
 def loading_map(map):
     """
     Tato funkce načte mapu
+    :param map: zadaná vstupní data
     :return: výstupem funkce bude seznam souřadnic
     """
     with open(map["PATH"]) as map["NAME"]:
@@ -31,6 +32,7 @@ def loading_map(map):
 def load_start_and_end(test_path):
     """
     Tato funkce načte startovní a cílovou pozici
+    :param test_path: zadaná vstupní data
     :return: Výstupem této funkce bude startovní a cílová poizce
     """
     with open(test_path["PATH"]) as test_path["NAME"]:
