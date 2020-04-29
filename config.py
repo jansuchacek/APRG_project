@@ -1,4 +1,5 @@
 #cesty pro načtení dat
+
 MAPS = {
     "map_0": {
         "NAME": "map_data_0",
