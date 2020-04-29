@@ -3,9 +3,9 @@ from math import atan2
 from random import randint
 import config
 import loading_data
-from optimal_way import optimal_way
 
-def zobrazeni_bodu(points, convex_hull = None, ispath = False):
+
+def zobrazeni_bodu(points, convex_hull=None):
     """
     Funkcia zobrazí načítané dáta z mapy.
     :param points: jednotlivé polygony v mape
@@ -22,10 +22,7 @@ def zobrazeni_bodu(points, convex_hull = None, ispath = False):
                 i = 0
             h0 = convex_hull[i-1]
             h1 = convex_hull[i]
-            if ispath:
-                plt.plot((h0[0], h1[0]), (h0[1], h1[1]), "b")
-            else:
-                plt.plot((h0[0], h1[0]), (h0[1], h1[1]), "r")
+            plt.plot((h0[0], h1[0]), (h0[1], h1[1]), "r")
 
 
 def polarni_uhel(p0, p1=None):
@@ -126,26 +123,11 @@ def main():
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
     points = loading_data.loading_map(map1)
-    starts, ends = loading_data.load_start_and_end(config.TEST_PATH["test_path"])
-
-    konvexne_obalky = []
 
 
     for sets in points:
         print(sets)
-
-        points = []
-        graham_points = graham_scan(sets)
-
-        print(points)
-        konvexne_obalky.append(graham_points)
-        zobrazeni_bodu(sets, graham_points)
-
-
-    #vložit funkci na vložení optimální trasy
-    run_index = 3
-    path = optimal_way(starts[run_index], ends[run_index], konvexne_obalky)
-    zobrazeni_bodu(path, path, True)
+        zobrazeni_bodu(sets, graham_scan(sets))
     plt.show()
 
 

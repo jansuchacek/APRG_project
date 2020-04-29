@@ -1,123 +1,114 @@
-import optimal_way_util
+import heapq
+from typing import Union, List, Tuple
 
-def which_side_points(a, b, c):
-    d = (c[1] - a[1]) * (b[0] - a[0]) - (b[1] - a[1]) * (c[0] - a[0])
-    return 1 if d > 0 else (-1 if d < 0 else 0)
+import networkx as nx
+from sympy import Line, Polygon
 
+Num = Union[int, float]
 
-def is_point_in_closed_segment(a, b, c):
-    if a[0] < b[0]:
-        return a[0] <= c[0] <= b[0]
-    if b[0] < a[0]:
-        return b[0] <= c[0] <= a[0]
+# A coordinate is a tuple of two numbers (int|float)
+Coordinate = Tuple[Num, Num]
 
-    if a[1] < b[1]:
-        return a[1] <= c[1] <= b[1]
-    if b[1] < a[1]:
-        return b[1] <= c[1] <= a[1]
-
-    return a[0] == c[0] and a[1] == c[1]
+# Obstacle is a list of Coordinates
+Obstacle = List[Coordinate]
 
 
-def segment_intersection(a, b, c, d):
-    if a == b:
-        return a == c or a == d
-    if c == d:
-        return c == a or c == b
+class SimpleGraph:
+    def __init__(self):
+        self.edges = {}
 
-    s1 = which_side_points(a, b, c)
-    s2 = which_side_points(a, b, d)
-
-    if s1 == 0 and s2 == 0:
-        return \
-            is_point_in_closed_segment(a, b, c) \
-            or is_point_in_closed_segment(a, b, d) \
-            or is_point_in_closed_segment(c, d, a) \
-            or is_point_in_closed_segment(c, d, b)
-
-    if s1 and s1 == s2:
-        return False
-
-    s1 = which_side_points(c, d, a)
-    s2 = which_side_points(c, d, b)
-
-    if s1 and s1 == s2:
-        return False
-
-    return True
+    def neighbors(self, id):
+        return self.edges[id]
 
 
-def which_side(line, point):
-    return (point[0] - line[0][0]) * (line[1][1] - line[0][1]) - (point[1] - line[0][1]) * (line[1][0] - line[0][0])
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
 
-def object_control(start, end, konvexne_obalky):
-    relevant_objects = []
-    for i in konvexne_obalky:
-        object = i
-        priesecnik = []
-        for j in range(len(object) - 1):
-            point_1 = object[j]
-            point_2 = object[j + 1]
-            if start == point_1 or start == point_2:  # neberie do uvahy stranu v ktorej sa nachadza start
-                continue
-            if segment_intersection(point_1, point_2, start, end):
-                priesecnik.append(1)
+    def empty(self):
+        return len(self.elements) == 0
 
-        if len(priesecnik) > 0:
-            relevant_objects.append(i)
+    def put(self, item, priority):
+        heapq.heappush(self.elements, (priority, item))
 
-    return relevant_objects
+    def get(self):
+        return heapq.heappop(self.elements)[1]
 
 
-def optimal_way(start, end, konvexne_obalky):
-    for obstacle in konvexne_obalky:
-        obstacle.pop(-1)
+class Pathfinder:
+    def __init__(self, obstacles: List[Obstacle]):
+        self.graph = self.build_graph(obstacles)
 
-    path = [start]
+    def build_graph(self, obstacles: List[Obstacle]):
+        graph = nx.Graph()
 
-    while not path[-1] == end:
-        relevant_objects = object_control(start, end, konvexne_obalky)
+        polygons = []
+        visited_lines = []
 
-        if len(relevant_objects) == 0:
-                path.append(end)
+        for obst_coords in obstacles:
+            poly = Polygon(*obst_coords)
+            polygons.append(poly)
 
-        else:
-            closest_point, closest_object = optimal_way_util.get_closest_point(relevant_objects, start)
-            for point in closest_object:
-                line = [start, end]
-                det = which_side(line, point)
-                if det > 0:
-                    point.append(1)
-                else:
-                    point.append(-1)
+            coors_len = len(obst_coords)
+            i = 0
+            while i < coors_len:
+                c1 = obst_coords[i]
+                try:
+                    c2 = obst_coords[i + 1]
+                except IndexError:
+                    c2 = obst_coords[-1]
 
-            sign = closest_point[-1]                #na ktorej strane je closest_point
-            closest_point.pop(-1)
-            if closest_point not in path:
-                path.append(closest_point)
+                if c1 != c2:
+                    visited_lines.append(Line(c1, c2))
+                    graph.add_edge(c1, c2)
 
-            points = []
-            for point in closest_object:
-                if point == closest_point:
-                    pass
-                elif point[-1] == sign:             #ak sa strany zhoduju, prida point do cesty
-                    point.pop(-1)
-                    points.append(point)
-                else:
-                    point.pop(-1)
+                i += 1
 
-            index = closest_object.index(closest_point)
+        coordinates = []
 
-            for point in points:
-                if index == 0:
-                    if point == closest_object[1] or point == closest_object[-1]:
-                        path.append(point)
-                elif index == len(closest_object) - 1:
-                    if point == closest_object[-2] or point == closest_object[0]:
-                        path.append(point)
-                elif point == closest_object[index + 1] or point == closest_object[index - 1]:
-                    path.append(point)
-                else:
-                    pass
-            start = path[-1]
-    return path
+        # brute force the rest
+        for obst_coords in obstacles:
+            coordinates.extend(obst_coords)
+
+        for coord1 in coordinates:
+            for coord2 in coordinates:
+                if coord1 == coord2:
+                    continue
+
+                l = Line(coord1, coord2)
+                if l in visited_lines:
+                    continue
+
+                for poly in polygons:
+                    intersect = l.intersection(poly)
+                    if len(intersect) > 1:
+                        graph.add_edge()
+
+
+    @staticmethod
+    def heuristic(a, b):
+        (x1, y1) = a
+        (x2, y2) = b
+        return abs(x1 - x2) + abs(y1 - y2)
+
+    def _a_star_search(self, start, goal):
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = None
+        cost_so_far[start] = 0
+
+        while not frontier.empty():
+            current = frontier.get()
+
+            if current == goal:
+                break
+
+            for next in self.graph.neighbors(current):
+                new_cost = cost_so_far[current] + self.graph.cost(current, next)
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    priority = new_cost + self.heuristic(goal, next)
+                    frontier.put(next, priority)
+                    came_from[next] = current

@@ -9,20 +9,11 @@ def draw_points(points):
     :param points: seznam bodů jednotlivých překážek importovaných z modulu loading_data.py
     :return: graf bodů
     """
-    xs = []
-    ys = []
     for set_of_points in points:
-        x,y = zip(*set_of_points)
-        print(x,y)
+        x, y = zip(*set_of_points)
+        print("x:", x, "y:", y)
         plt.scatter(x, y)
         plt.plot(x, y)  #spojí jednotlivé body tvořící překážku
-        #plt.show()      #vykreslí body jednotlivých překážek do grafu
-        for index in range(len(x)):
-            xs.append(x[index])
-        for index in range(len(y)):
-            ys.append(y[index])
-
-    plt.scatter(xs, ys)
     return plt.show()       #vykreslí body všech překážek najednou do jednoho grafu
 
 
