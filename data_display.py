@@ -13,7 +13,7 @@ def draw_points(points):
         x, y = zip(*set_of_points)
         print("x:", x, "y:", y)
         plt.scatter(x, y)
-        plt.plot(x, y)  #spojí jednotlivé body tvořící překážku
+        plt.plot(x, y)      #spojí jednotlivé body tvořící překážku
     return plt.show()       #vykreslí body všech překážek najednou do jednoho grafu
 
 
