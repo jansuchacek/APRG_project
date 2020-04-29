@@ -5,24 +5,53 @@ import config
 import loading_data
 
 
-def zobrazeni_bodu(points, convex_hull=None):
+def graham_scan(points):
     """
-    Funkcia zobrazí načítané dáta z mapy.
-    :param points: jednotlivé polygony v mape
-    :param convex_hull: ak != None, zobrazí konvexný obal k danému polygonu
-    :return: zobrazí výsledok
+    Funkcia vytvorí konvexný obal ku každému polygonu mapy.
+    :param points: body daného polygonu
+    :return: vráti konvexnú obálku
     """
+    global anchor   # premenná "anchor" nastavená ako globálna - najnižší bod
 
-    x, y = zip(*points)
-    plt.scatter(x, y)
+    min_index = None
+    for i, (x, y) in enumerate(points):
+        if (min_index == None) or (y < points[min_index][1]):
+            min_index = i
+        if (y == points[min_index][1]) and (x < points[min_index][0]):
+            min_index = i
+    anchor = points[min_index]
+    sorted_points = razeni_podle_uhlu(points)
+    del sorted_points[sorted_points.index(anchor)]
+    hull = [anchor, sorted_points[0]]
+    for point in sorted_points[1:]:
+        while determinant(hull[-2], hull[-1], point) <= 0:
+            del hull[-1]
+        hull.append(point)
+    return hull
 
-    if convex_hull != None:
-        for i in range(1, len(convex_hull)+1):
-            if i == len(convex_hull):
-                i = 0
-            h0 = convex_hull[i-1]
-            h1 = convex_hull[i]
-            plt.plot((h0[0], h1[0]), (h0[1], h1[1]), "r")
+
+def razeni_podle_uhlu(points):
+    """
+    Funkcia roztriedi dané body polygonu podľa narastajúceho uhlu medzi bodom "anchor".
+    Body s rovnakými uhlami budú roztriedené podľa ich vzdialenosti k bodu "anchor".
+    """
+    if len(points) <= 1:
+        return points
+    smaller = []
+    equal = []
+    bigger = []
+    random_angle = polarni_uhel(points[randint(0, len(points) - 1)])
+    for pt in points:
+        pt_angle = polarni_uhel(pt)
+        if pt_angle < random_angle:
+            smaller.append(pt)
+        elif pt_angle == random_angle:
+            equal.append(pt)
+        else:
+            bigger.append(pt)
+    return razeni_podle_uhlu(smaller) \
+           + sorted(equal, key=vzdalenost_bodu) \
+           + razeni_podle_uhlu(bigger)
 
 
 def polarni_uhel(p0, p1=None):
@@ -69,53 +98,24 @@ def determinant(p1, p2, p3):
            -(p2[1]-p1[1])*(p3[0]-p1[0])
 
 
-def razeni_podle_uhlu(points):
+def zobrazeni_bodu(points, convex_hull=None):
     """
-    Funkcia roztriedi dané body polygonu podľa narastajúceho uhlu medzi bodom "anchor".
-    Body s rovnakými uhlami budú roztriedené podľa ich vzdialenosti k bodu "anchor".
+    Funkcia zobrazí načítané dáta z mapy.
+    :param points: jednotlivé polygony v mape
+    :param convex_hull: ak != None, zobrazí konvexný obal k danému polygonu
+    :return: zobrazí výsledok
     """
-    if len(points) <= 1:
-        return points
-    smaller = []
-    equal = []
-    bigger = []
-    rand_ang = polarni_uhel(points[randint(0, len(points) - 1)])
-    for pt in points:
-        pt_ang = polarni_uhel(pt)
-        if pt_ang < rand_ang:
-            smaller.append(pt)
-        elif pt_ang == rand_ang:
-            equal.append(pt)
-        else:
-            bigger.append(pt)
-    return razeni_podle_uhlu(smaller) \
-           + sorted(equal, key=vzdalenost_bodu) \
-           + razeni_podle_uhlu(bigger)
 
+    x, y = zip(*points)
+    plt.scatter(x, y)
 
-def graham_scan(points):
-    """
-    Funkcia vytvorí konvexný obal ku každému polygonu mapy.
-    :param points: body daného polygonu
-    :return: vráti konvexnú obálku
-    """
-    global anchor   # premenná "anchor" nastavená ako globálna - najnižší bod
-
-    min_idx = None
-    for i, (x, y) in enumerate(points):
-        if (min_idx == None) or (y < points[min_idx][1]):
-            min_idx = i
-        if (y == points[min_idx][1]) and (x < points[min_idx][0]):
-            min_idx = i
-    anchor = points[min_idx]
-    sorted_points = razeni_podle_uhlu(points)
-    del sorted_points[sorted_points.index(anchor)]
-    hull = [anchor, sorted_points[0]]
-    for s in sorted_points[1:]:
-        while determinant(hull[-2], hull[-1], s) <= 0:
-            del hull[-1]
-        hull.append(s)
-    return hull
+    if convex_hull != None:
+        for i in range(1, len(convex_hull)+1):
+            if i == len(convex_hull):
+                i = 0
+            h0 = convex_hull[i-1]
+            h1 = convex_hull[i]
+            plt.plot((h0[0], h1[0]), (h0[1], h1[1]), "r")
 
 
 def main():
@@ -123,7 +123,6 @@ def main():
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
     points = loading_data.loading_map(map1)
-
 
     for sets in points:
         print(sets)
