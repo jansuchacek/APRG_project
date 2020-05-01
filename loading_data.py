@@ -52,6 +52,8 @@ def load_start_and_end(test_path):
 
 
 def main():
+    """Hlavní funkce"""
+
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
     points = loading_map(map0)
