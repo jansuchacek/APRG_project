@@ -18,6 +18,8 @@ def draw_points(points):
 
 
 def main():
+    """Toto je řídící funkce"""
+
     map0 = config.MAPS["map_0"]
     map1 = config.MAPS["map_1"]
     points = loading_data.loading_map(map1)
